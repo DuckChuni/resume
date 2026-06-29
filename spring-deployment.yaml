@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+
+#Deployment 기본 정보
+metadata:
+  name: spring-deployment #Deployment 이름
+
+#Deployment 세부 정보
+spec:
+  replicas: 3 #생성할 파드의 복제본 개수
+  selector:
+    matchLabels:
+      app: backend-app
+
+  #배포할 Pod 정의
+  template:
+    metadata:
+      labels:
+        app: backend-app
+    spec:
+      imagePullSecrets:
+        - name: regcred
+      containers:
+        - name: spring-container #컨테이너 이름
+          image: 824271109114.dkr.ecr.ap-northeast-2.amazonaws.com/toy-project-a9872:latest #컨테이너 생성할 때 사용할 이미지
+          imagePullPolicy: IfNotPresent #로컬에서 이미지를 먼저 가져온다. 없으면 리즈스트리에서 가져온다.
+          ports:
+            - containerPort: 8080 #컨테이너에서 사용하는 포트를 명시적으로 표현
+          env:
+            - name: DB_HOST
+              value: mysql-service # Service의 name만 입력하면 다른 서비스와 통신할 수 있다.
+            - name: DB_PORT
+              value: "3306"
+            - name: DB_NAME
+              value: kub_practice
+            - name: DB_USERNAME
+              value: root
+            - name: DB_PASSWORD
+              value: password123
+
+
+
